@@ -1,0 +1,202 @@
+# iuuiiu<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黒木のランダムカラーシェイプ・ジェネレーター</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            touch-action: manipulation; /* スマートフォンでのダブルタップズームを無効化 */
+        }
+        canvas {
+            background-color: #f0f4f8;
+        }
+        /* カラーピッカーのスタイル調整 */
+        input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 50px;
+            height: 50px;
+            border: none;
+            cursor: pointer;
+            background-color: transparent;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+        }
+        /* アクティブなボタンスタイル */
+        .active-style-btn {
+            background-color: #1d4ed8; /*濃い青*/
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md text-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">黒木のランダムカラーシェイプ</h1>
+        <p class="text-gray-600 mb-6">好きな文字を入力してください。</p>
+
+        <!-- 文字入力フィールド -->
+        <input type="text" id="textInput" placeholder="ここに文字を入力" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg text-center focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm mb-4">
+        
+        <!-- スタイル選択ボタン -->
+        <div class="mb-4">
+            <div class="inline-flex rounded-md shadow-sm" role="group">
+                <button type="button" id="gradientBtn" class="style-btn active-style-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700">
+                    グラデーション
+                </button>
+                <button type="button" id="halfBtn" class="style-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700">
+                    半分
+                </button>
+            </div>
+        </div>
+
+        <!-- 色選択コントロールエリア -->
+        <div class="flex items-center justify-center gap-4">
+            <input type="color" id="colorPickerLeft" value="#3B82F6">
+            <button id="regenerateColorBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-colors">ランダムに色を変更</button>
+            <input type="color" id="colorPickerRight" value="#8B5CF6">
+        </div>
+    </div>
+
+    <!-- 描画エリア -->
+    <div class="w-full max-w-md aspect-square mt-6">
+        <canvas id="mainCanvas" class="w-full h-full rounded-xl shadow-lg"></canvas>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const regenerateColorBtn = document.getElementById('regenerateColorBtn');
+        const colorPickerLeft = document.getElementById('colorPickerLeft');
+        const colorPickerRight = document.getElementById('colorPickerRight');
+        const gradientBtn = document.getElementById('gradientBtn');
+        const halfBtn = document.getElementById('halfBtn');
+
+        let fillStyle = 'gradient'; // 'gradient' or 'half'
+
+        // ランダムな色を生成する関数
+        const getRandomColor = () => {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        };
+        
+        // 描画処理を行うメインの関数
+        const draw = () => {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const text = textInput.value;
+            const centerX = canvas.width / (2 * dpr);
+            const centerY = canvas.height / (2 * dpr);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!text) return;
+
+            const size = Math.min(centerX, centerY) * 0.9 * 2;
+            const startX = centerX - size / 2;
+            const startY = centerY - size / 2;
+            
+            if (fillStyle === 'gradient') {
+                const gradient = ctx.createLinearGradient(startX, centerY, startX + size, centerY);
+                gradient.addColorStop(0, colorPickerLeft.value);
+                gradient.addColorStop(1, colorPickerRight.value);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(startX, startY, size, size);
+            } else if (fillStyle === 'half') {
+                ctx.fillStyle = colorPickerLeft.value;
+                ctx.fillRect(startX, startY, size / 2, size);
+                ctx.fillStyle = colorPickerRight.value;
+                ctx.fillRect(startX + size / 2, startY, size / 2, size);
+            }
+
+            // 文字を描画
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // ★修正: フォントサイズを以前の円の時と同じ基準に戻す
+            let fontSize = Math.min(centerX, centerY) * 0.7; // 開始フォントサイズ
+            ctx.font = `${fontSize}px "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", sans-serif`;
+
+            // テキストの幅が四角形の幅の85%より大きい場合、フォントサイズを小さくする
+            while (ctx.measureText(text).width > size * 0.85 && fontSize > 10) {
+                fontSize -= 2;
+                ctx.font = `${fontSize}px "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", sans-serif`;
+            }
+            
+            ctx.fillText(text, centerX, centerY);
+        };
+
+        const setRandomColorsAndDraw = () => {
+            colorPickerLeft.value = getRandomColor();
+            colorPickerRight.value = getRandomColor();
+            draw();
+        };
+
+        // スタイルボタンの切り替えロジック
+        const updateStyleButtons = () => {
+            if (fillStyle === 'gradient') {
+                gradientBtn.classList.add('active-style-btn');
+                gradientBtn.classList.remove('bg-white', 'text-gray-900');
+                halfBtn.classList.remove('active-style-btn');
+                halfBtn.classList.add('bg-white', 'text-gray-900');
+            } else {
+                halfBtn.classList.add('active-style-btn');
+                halfBtn.classList.remove('bg-white', 'text-gray-900');
+                gradientBtn.classList.remove('active-style-btn');
+                gradientBtn.classList.add('bg-white', 'text-gray-900');
+            }
+        };
+
+        // イベントリスナーを設定
+        textInput.addEventListener('input', draw);
+        window.addEventListener('resize', draw);
+        regenerateColorBtn.addEventListener('click', setRandomColorsAndDraw);
+        colorPickerLeft.addEventListener('input', draw);
+        colorPickerRight.addEventListener('input', draw);
+
+        gradientBtn.addEventListener('click', () => {
+            fillStyle = 'gradient';
+            updateStyleButtons();
+            draw();
+        });
+
+        halfBtn.addEventListener('click', () => {
+            fillStyle = 'half';
+            updateStyleButtons();
+            draw();
+        });
+
+        // 初期描画
+        window.onload = () => {
+            textInput.value = "こんにちは";
+            updateStyleButtons();
+            setRandomColorsAndDraw();
+        };
+    </script>
+
+</body>
+</html>
