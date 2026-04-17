@@ -1,15 +1,45 @@
-<script>
-      window.difyChatbotConfig = {
-        token: 'BNxxA0Hh6uIl4wGX',
-      }
-    </script>
-    <script src="https://udify.app/embed.min.js" id="BNxxA0Hh6uIl4wGX" defer></script>
-    <style>
-      #dify-chatbot-bubble-button {
-        background-color: #1C64F2 !important;
-      }
-      #dify-chatbot-bubble-window {
-        width: 24rem !important;
-        height: 40rem !important;
-      }
-    </style>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黒木のランダムカラーシェイプ・ジェネレーター</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md text-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">黒木のランダムカラーシェイプ</h1>
+        <p class="text-gray-600 mb-6">好きな文字を入力してください。</p>
+
+        <input type="text" id="textInput" placeholder="ここに文字を入力" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-lg text-center focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm mb-4">
+        
+        <div class="mb-4">
+            <div class="inline-flex rounded-md shadow-sm" role="group">
+                <button type="button" id="gradientBtn" class="style-btn active-style-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700">
+                    グラデーション
+                </button>
+                <button type="button" id="halfBtn" class="style-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-700">
+                    半分
+                </button>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-4">
+            <input type="color" id="colorPickerLeft" value="#3B82F6">
+            <button id="regenerateColorBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-colors">ランダムに色を変更</button>
+            <input type="color" id="colorPickerRight" value="#8B5CF6">
+        </div>
+    </div>
+
+    <div class="w-full max-w-md aspect-square mt-6">
+        <canvas id="mainCanvas" class="w-full h-full rounded-xl shadow-lg"></canvas>
+    </div>
+
+</body>
+</html>
